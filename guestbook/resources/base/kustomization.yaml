@@ -6,6 +6,6 @@ resources:
   - guestbook-frontend.service.yaml
   - guestbook-mongodb.deployment.yaml
   - guestbook-mongodb.service.yaml
-namespace: guestbook
+namespace: xymox-guestbook-main
 commonLabels:
   app: guestbook
