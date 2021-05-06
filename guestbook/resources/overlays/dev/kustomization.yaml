@@ -9,7 +9,6 @@ patchesStrategicMerge:
 - guestbook-backend.deployment.yaml
 
 # namePrefix: dev-
-namespace: xymox-guestbook
 commonLabels:
   environment: development
 
