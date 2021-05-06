@@ -1,8 +1,9 @@
-resources:
-- ../../base
-
 commonLabels:
   environment: staging
+
+bases:
+- ../../base
+
 
 images:
 - name: guestbook-backend
