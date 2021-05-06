@@ -1,5 +1,7 @@
-resources:
+bases:
 - ../../base
+
+resources:
 - guestbook-frontend.route.yaml
 
 patchesStrategicMerge:
