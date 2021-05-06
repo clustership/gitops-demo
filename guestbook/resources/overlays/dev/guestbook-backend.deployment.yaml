@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-guestbook-backend
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: init-db-ready
+        image: mongo:4
+        command: 
+        - /bin/sh
+        - -c
+        args:
+        - echo "Loading env vars" ;
+          echo "Waiting for mongodb at ${GUESTBOOK_DB_ADDR} to go live before the BE..."; 
+          export GUESTBOOK_DB_ADDR="mongodb://admin:${MONGODB_ADMIN_PASSWORD}@go-guestbook-mongodb:27017/admin" ;
+          until (mongo "${GUESTBOOK_DB_ADDR}" --eval "rs.status();" >/dev/null) do echo "Waiting for connection for 2 sec."; sleep 2; done
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MONGODB_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: admin-password
+        - name: MONGODB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: dbname
+        - name: MONGODB_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: password
+      containers:
+      - name: backend
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - env GUESTBOOK_DB_ADDR="${MONGODB_USER}:${MONGODB_PASSWORD}@go-guestbook-mongodb:27017/${MONGODB_DATABASE}" ./backend
+        image: guestbook-backend
+        env:
+        - name: MONGODB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: dbname
+        - name: MONGODB_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-secret-config
+              key: password
+        - name: PORT
+          value: "8080"
+        - name: GUESTBOOK_DB_ADDR
+          value: go-guestbook-mongodb:27017
+          $patch: delete
+        ports:
+        - name: http-server
+          containerPort: 8080
+        - name: debug
+          containerPort: 3000
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: mongodb-env
+        emptyDir: {}
+      - name: mongodb-initenv
+        configMap:
+          name: db-creds
