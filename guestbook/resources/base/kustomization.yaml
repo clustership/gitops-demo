@@ -3,9 +3,11 @@ resources:
   - guestbook-backend.deployment.yaml
   - guestbook-backend.service.yaml
   - guestbook-frontend.deployment.yaml
+  - guestbook-frontend.route.yaml
   - guestbook-frontend.service.yaml
   - guestbook-mongodb.deployment.yaml
   - guestbook-mongodb.service.yaml
-namespace: guestbook
+
+namespace: xymox-guestbook
 commonLabels:
   app: guestbook

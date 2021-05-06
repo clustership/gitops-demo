@@ -1,0 +1,10 @@
+resources:
+- ../../base
+
+commonLabels:
+  environment: staging
+
+images:
+- name: guestbook-backend
+  newName: quay.io/xymox/guestbook
+  newTag: backend-golang-latest
