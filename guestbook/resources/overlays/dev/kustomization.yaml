@@ -19,6 +19,7 @@ images:
 
 secretGenerator:
 - name: database-secret-config
+  namespace: xymox-guestbook-main
   literals:
   - dbname=guestbook
   - username=mongo
